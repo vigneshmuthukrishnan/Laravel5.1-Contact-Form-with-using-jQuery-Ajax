@@ -30,3 +30,54 @@
 <div class="thanks" style="display:none;">
   <p>Thank　you for your Message!</p>
 </div>
+
+<script type="text/javascript">
+  $.ajaxSetup({
+      headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+  });
+
+  $(document).ready(function(){
+    $('form').submit(function(e){
+
+    e.preventDefault();
+
+    //formData
+    var formData = new FormData();
+
+    formData.append('name',$('#name').val());
+    formData.append('subject',$('#subject').val());
+    formData.append('email',$('#email').val());
+    formData.append('message',$('#message').val());
+
+    $.ajax({
+      url:'contact',
+      method:'post',
+      processData:false,
+      contentType:false,
+      cache:false,
+      dataType:'json',
+      data:formData,
+      success:function(data){
+        var info = $(".info");
+        info.hide().find('ul').empty();
+
+        if(!data.success){
+          $.each(data.errors,function(index,error){
+            info.find('ul').append('<li>'+error+'</li>');
+          });
+          info.slideDown();
+        }else{
+          $('#contact_form').fadeOut(800);
+          $('.thanks').slideDown();
+        }
+      },
+      error:function(){
+        // do something
+      }
+      });
+
+    });
+  });
+</script>
